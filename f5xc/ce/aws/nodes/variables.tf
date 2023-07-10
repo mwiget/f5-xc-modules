@@ -105,10 +105,10 @@ variable "f5xc_cluster_name" {
 
 variable "f5xc_cluster_size" {
   type = number
-  validation {
-    condition     = var.f5xc_cluster_size == 1 || var.f5xc_cluster_size == 3
-    error_message = format("Valid values for f5xc_cluster_size: 1 or 3")
-  }
+  #  validation {
+  #  condition     = var.f5xc_cluster_size == 1 || var.f5xc_cluster_size == 3
+  #  error_message = format("Valid values for f5xc_cluster_size: 1 or 3")
+  #}
 }
 
 variable "f5xc_node_name" {

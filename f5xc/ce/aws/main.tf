@@ -82,7 +82,6 @@ module "config" {
   ssh_public_key               = var.ssh_public_key
   f5xc_site_token              = volterra_token.site.id
   f5xc_cluster_name            = var.f5xc_cluster_name
-  f5xc_server_roles            = local.server_roles[each.key]
   f5xc_cluster_labels          = var.f5xc_cluster_labels
   f5xc_cluster_workload        = var.cluster_workload
   f5xc_cluster_latitude        = var.f5xc_cluster_latitude

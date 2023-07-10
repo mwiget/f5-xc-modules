@@ -109,10 +109,6 @@ variable "f5xc_cluster_uid" {
   default = ""
 }
 
-variable "f5xc_server_roles" {
-  type = string
-}
-
 variable "f5xc_ce_gateway_type_ingress" {
   type    = string
   default = "ingress_gateway"
