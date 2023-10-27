@@ -1,7 +1,8 @@
 resource "vsphere_virtual_machine" "vm" {
+  depends_on       = [ volterra_token.token ]
   for_each         = {for k,v in var.nodes: k => v}
   name             = format("%s-%s", var.cluster_name, each.value.name)
-  datacenter_id    = data.vsphere_datacenter.dc.id
+  datacenter_id    = var.f5xc_ova_image == "" ? "" : data.vsphere_datacenter.dc.id
   resource_pool_id = data.vsphere_compute_cluster.cluster.resource_pool_id
   datastore_id     = data.vsphere_datastore.ds[each.key].id
   host_system_id   = data.vsphere_host.host[each.key].id
@@ -29,18 +30,28 @@ resource "vsphere_virtual_machine" "vm" {
     thin_provisioned = false
   }
 
-  ovf_deploy {
-    allow_unverified_ssl_cert = true
-    local_ovf_path            = var.f5xc_ova_image
+  dynamic "ovf_deploy" {
+    for_each = var.f5xc_ova_image == "" ? [] : [0]
+    content {
+      allow_unverified_ssl_cert = true
+      local_ovf_path            = var.f5xc_ova_image
 
-    disk_provisioning = "thick"
+      disk_provisioning = "thick"
 
-    ovf_network_map = var.inside_network == "" ? { 
-      "OUTSIDE" = data.vsphere_network.outside.id 
-    } : {
-      "OUTSIDE" = data.vsphere_network.outside.id
-      "REGULAR" = data.vsphere_network.inside.id
+      ovf_network_map = var.inside_network == "" ? { 
+        "OUTSIDE" = data.vsphere_network.outside.id 
+      } : {
+        "OUTSIDE" = data.vsphere_network.outside.id
+        "REGULAR" = data.vsphere_network.inside.id
+      }
     }
+  }
+
+  dynamic "clone" {
+   for_each = var.f5xc_vm_template == "" ? [] : [0]
+   content {
+    template_uuid = data.vsphere_virtual_machine.template[0].id
+   }
   }
 
   vapp {
@@ -49,7 +60,7 @@ resource "vsphere_virtual_machine" "vm" {
       "guestinfo.interface.0.ip.0.address"        = each.value.ipaddress,
       "guestinfo.interface.0.name"                = "eth0",
       "guestinfo.interface.0.route.0.destination" = var.publicdefaultroute,
-      "guestinfo.interface.0.dhcp"                = "no",
+      "guestinfo.interface.0.dhcp"                = each.value.ipaddress == "dhcp" ? "yes": "no",
       "guestinfo.interface.0.role"                = "public",
       "guestinfo.interface.0.route.0.gateway"     = var.publicdefaultgateway,
       "guestinfo.dns.server.0"                    = var.dnsservers["primary"],
@@ -107,16 +118,6 @@ resource "volterra_site_state" "decommission_when_delete" {
   wait_time  = 60
   retry      = 5
   depends_on = [volterra_registration_approval.ce]
-}
-
-resource "volterra_modify_site" "site" {
-  namespace               = "system"
-  name                    = var.cluster_name
-  labels                  = var.custom_labels
-  outside_vip             = var.outside_vip
-  vip_vrrp_mode           = var.outside_vip == "" ? "VIP_VRRP_DISABLE" : "VIP_VRRP_ENABLE"
-  site_to_site_tunnel_ip  = var.outside_vip == "" ? split("/",var.nodes[0]["ipaddress"])[0] : var.outside_vip
-  depends_on              = [volterra_registration_approval.ce]
 }
 
 output "vm" {

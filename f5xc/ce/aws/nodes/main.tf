@@ -1,11 +1,11 @@
 resource "aws_instance" "instance" {
   ami                  = var.aws_instance_image
+  tags                 = local.common_tags
+  key_name             = var.ssh_public_key_name
+  monitoring           = var.aws_instance_monitoring
   instance_type        = var.aws_instance_type
   user_data_base64     = base64encode(var.f5xc_instance_config)
-  monitoring           = var.aws_instance_monitoring
-  key_name             = var.public_ssh_key_name
   iam_instance_profile = var.aws_iam_instance_profile_id
-  tags                 = local.common_tags
 
   root_block_device {
     volume_size = var.aws_instance_disk_size
@@ -17,7 +17,7 @@ resource "aws_instance" "instance" {
   }
 
   dynamic "network_interface" {
-    for_each = var.f5xc_ce_gateway_type == var.f5xc_ce_gateway_type_ingress_egress ? [1] : []
+    for_each = var.is_multi_nic ? [1] : []
     content {
       network_interface_id = var.aws_interface_sli_id
       device_index         = "1"

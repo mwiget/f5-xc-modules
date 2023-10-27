@@ -1,13 +1,59 @@
 resource "volterra_aws_tgw_site" "site" {
   name                     = var.f5xc_aws_tgw_name
-  labels                   = var.f5xc_aws_tgw_labels
   tags                     = var.custom_tags
+  labels                   = var.f5xc_aws_tgw_labels
   namespace                = var.f5xc_namespace
   description              = var.f5xc_aws_tgw_description
   annotations              = var.f5xc_aws_tgw_annotations
   direct_connect_disabled  = var.f5xc_aws_tgw_direct_connect_disabled
   logs_streaming_disabled  = var.f5xc_aws_tgw_logs_streaming_disabled
   default_blocked_services = var.f5xc_aws_tgw_default_blocked_services
+
+  tgw_security {
+    dynamic "active_forward_proxy_policies" {
+      for_each = var.f5xc_active_forward_proxy_policies
+      content {
+        forward_proxy_policies {
+          name      = active_forward_proxy_policies.value.name
+          tenant    = active_forward_proxy_policies.value.tenant
+          namespace = active_forward_proxy_policies.value.namespace
+        }
+      }
+    }
+
+    dynamic "active_network_policies" {
+      for_each = var.f5xc_active_network_policies
+      content {
+        network_policies {
+          name      = active_network_policies.value.name
+          tenant    = active_network_policies.value.tenant
+          namespace = active_network_policies.value.namespace
+        }
+      }
+    }
+
+    dynamic "active_enhanced_firewall_policies" {
+      for_each = var.f5xc_active_enhanced_firewall_policies
+      content {
+        enhanced_firewall_policies {
+          name      = active_enhanced_firewall_policies.value.name
+          tenant    = active_enhanced_firewall_policies.value.tenant
+          namespace = active_enhanced_firewall_policies.value.namespace
+        }
+      }
+    }
+
+    dynamic "active_enhanced_firewall_policies" {
+      for_each = var.f5xc_active_enhanced_firewall_policies
+      content {
+        enhanced_firewall_policies {
+          name      = active_enhanced_firewall_policies.value.name
+          tenant    = active_enhanced_firewall_policies.value.tenant
+          namespace = active_enhanced_firewall_policies.value.namespace
+        }
+      }
+    }
+  }
 
   dynamic "direct_connect_enabled" {
     for_each = var.f5xc_aws_tgw_direct_connect_disabled == false ? [1] : []
@@ -40,7 +86,9 @@ resource "volterra_aws_tgw_site" "site" {
         }
       }
     }
-    no_global_network = var.f5xc_aws_tgw_no_global_network
+    no_global_network       = var.f5xc_aws_tgw_no_global_network
+    sm_connection_pvt_ip    = var.f5xc_aws_tgw_sm_connection_public_ip ? false : true
+    sm_connection_public_ip = var.f5xc_aws_tgw_sm_connection_public_ip
   }
 
   lifecycle {
@@ -56,8 +104,10 @@ resource "volterra_aws_tgw_site" "site" {
   }
 
   aws_parameters {
-    aws_certified_hw = var.f5xc_aws_certified_hw
-    aws_region       = var.f5xc_aws_region
+    aws_certified_hw     = var.f5xc_aws_certified_hw
+    aws_region           = var.f5xc_aws_region
+    enable_internet_vip  = var.f5xc_aws_tgw_enable_internet_vip
+    disable_internet_vip = var.f5xc_aws_tgw_enable_internet_vip ? false : true
 
     dynamic "az_nodes" {
       for_each = var.f5xc_aws_tgw_id == "" && var.f5xc_aws_tgw_primary_ipv4 != "" ? var.f5xc_aws_tgw_az_nodes : {}
@@ -219,13 +269,13 @@ resource "volterra_aws_tgw_site" "site" {
   }
 }
 
-resource "volterra_cloud_site_labels" "labels" {
+/*resource "volterra_cloud_site_labels" "labels" {
   name             = volterra_aws_tgw_site.site.name
   site_type        = "aws_tgw_site"
   # need at least one label, otherwise site_type is ignored
   labels           = merge({ "key" = "value" }, var.f5xc_aws_tgw_labels)
   ignore_on_delete = var.f5xc_cloud_site_labels_ignore_on_delete
-}
+}*/
 
 resource "volterra_tf_params_action" "aws_tgw_action" {
   site_name       = volterra_aws_tgw_site.site.name

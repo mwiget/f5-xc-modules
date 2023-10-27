@@ -24,30 +24,35 @@ variable "inside_network" {
   type = string
   default = ""
 }
-variable "publicdefaultgateway" {}
+variable "publicdefaultgateway" {
+  type = string
+  default = ""
+}
+variable "publicdefaultroute" {
+  type = string
+  default = ""
+}
 variable "dnsservers" {}
 variable "cpus" {}
 variable "memory" {}
-variable "f5xc_ova_image" {}
+variable "f5xc_ova_image" {
+  type = string
+  default = ""
+}
+variable "f5xc_vm_template" {
+  type = string
+  default = ""
+}
 variable "f5xc_reg_url" {
   type    = string
   default = "ves.volterra.io"
 }
 
 variable "certifiedhardware" {}
-variable "publicdefaultroute" {}
 variable "cluster_name" {}
 variable "guest_type" {}
 variable "sitelatitude" {}
 variable "sitelongitude" {}
-variable "custom_labels" {
-  type  = map(string)
-  default = {}
-}
-variable "outside_vip" {
-  type = string
-  default = ""
-}
 variable "admin_password" {
   type = string
   default = ""

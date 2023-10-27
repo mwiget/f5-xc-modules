@@ -206,6 +206,11 @@ variable "f5xc_aws_tgw_direct_connect_custom_asn" {
   default = 0
 }
 
+variable "f5xc_aws_tgw_enable_internet_vip" {
+  type    = bool
+  default = false
+}
+
 variable "f5xc_aws_tgw_cloud_aggregated_prefix" {
   type    = list(string)
   default = []
@@ -261,3 +266,34 @@ variable "f5xc_aws_tgw_no_global_network" {
   default = true
 }
 
+variable "f5xc_aws_tgw_sm_connection_public_ip" {
+  type    = bool
+  default = true
+}
+
+variable "f5xc_active_forward_proxy_policies" {
+  type = list(object({
+    name      = string
+    tenant    = string
+    namespace = string
+  }))
+  default = []
+}
+
+variable "f5xc_active_network_policies" {
+  type = list(object({
+    name      = string
+    tenant    = string
+    namespace = string
+  }))
+  default = []
+}
+
+variable "f5xc_active_enhanced_firewall_policies" {
+  type = list(object({
+    name      = string
+    tenant    = string
+    namespace = string
+  }))
+  default = []
+}

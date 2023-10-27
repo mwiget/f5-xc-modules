@@ -2,6 +2,10 @@ variable "owner_tag" {
   type = string
 }
 
+variable "is_multi_nic" {
+  type = bool
+}
+
 variable "common_tags" {
   type = map(string)
 }
@@ -36,15 +40,7 @@ variable "aws_subnet_sli_id" {
   type = string
 }
 
-variable "public_ssh_key_name" {
-  type = string
-}
-
-variable "aws_security_group_slo_id" {
-  type = string
-}
-
-variable "aws_security_group_sli_id" {
+variable "ssh_public_key_name" {
   type = string
 }
 
@@ -78,6 +74,11 @@ variable "f5xc_api_url" {
   type = string
 }
 
+variable "f5xc_api_ca_cert" {
+  type = string
+  default = ""
+}
+
 variable "f5xc_api_token" {
   type = string
 }
@@ -96,20 +97,6 @@ variable "f5xc_registration_wait_time" {
 
 variable "f5xc_registration_retry" {
   type = number
-}
-
-variable "f5xc_ce_gateway_type_ingress" {
-  type    = string
-  default = "ingress_gateway"
-}
-
-variable "f5xc_ce_gateway_type_ingress_egress" {
-  type    = string
-  default = "ingress_egress_gateway"
-}
-
-variable "f5xc_ce_gateway_type" {
-  type = string
 }
 
 variable "f5xc_cluster_name" {
@@ -131,3 +118,4 @@ variable "f5xc_node_name" {
 variable "f5xc_instance_config" {
   type = string
 }
+

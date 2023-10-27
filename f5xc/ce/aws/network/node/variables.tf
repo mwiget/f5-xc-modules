@@ -3,7 +3,7 @@ variable "common_tags" {
 }
 
 variable "has_public_ip" {
-  type    = bool
+  type = bool
 }
 
 variable "aws_vpc_id" {
@@ -22,25 +22,23 @@ variable "aws_vpc_az" {
   type = string
 }
 
-variable "aws_sg_slo_id" {
+variable "aws_sg_slo_ids" {
+  type = list(string)
+}
+
+variable "aws_sg_sli_ids" {
+  type = list(string)
+}
+
+variable "is_multi_nic" {
+  type = bool
+}
+
+variable "aws_slo_subnet_rt_id" {
   type = string
 }
 
-variable "aws_sg_sli_id" {
-  type = string
-}
-
-variable "f5xc_ce_gateway_type_ingress" {
-  type    = string
-  default = "ingress_gateway"
-}
-
-variable "f5xc_ce_gateway_type_ingress_egress" {
-  type    = string
-  default = "ingress_egress_gateway"
-}
-
-variable "f5xc_ce_gateway_type" {
+variable "aws_sli_subnet_rt_id" {
   type = string
 }
 
@@ -50,4 +48,8 @@ variable "node_name" {
 
 variable "owner_tag" {
   type = string
+}
+
+variable "f5xc_is_secure_cloud_ce" {
+  type = bool
 }

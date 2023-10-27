@@ -132,7 +132,7 @@ class APICredential:
     @name.setter
     def name(self, name: str = None):
         if name is None:
-            raise ValueError('"name" must not beNone') from None
+            raise ValueError('"name" must not be none') from None
         try:
             self._name = str(name)
         except ValueError:
@@ -145,11 +145,11 @@ class APICredential:
     @expiration_days.setter
     def expiration_days(self, days: str = None):
         if days is None:
-            raise ValueError('"days must not be None') from None
+            raise ValueError('"expiry days must not be none') from None
         try:
             self._expiration_days = str(days)
         except ValueError:
-            raise ValueError('"days" must be string') from None
+            raise ValueError('"expiry days" must be string') from None
 
     @property
     def namespace(self) -> str:
@@ -335,8 +335,8 @@ if __name__ == '__main__':
     parser.add_argument("api_token", help="F5XC API TOKEN", type=str)
     parser.add_argument("tenant", help="F5XC Tenant", type=str)
     parser.add_argument("name", help="API Credential Object Name", type=str)
-    parser.add_argument("-v", "--vk8s", help="F5XC Virtual k8s Name", type=str)
-    parser.add_argument("-c", "--ctype", help="F5XC Credential Type", type=str)
+    parser.add_argument("-v", "--vk8s", help="F5XC Virtual k0s Name", type=str)
+    parser.add_argument("-client", "--ctype", help="F5XC Credential Type", type=str)
     parser.add_argument("-n", "--namespace", help="F5XC Credential Namespace", type=str)
     parser.add_argument("-p", "--certpw", help="F5XC API Certificate Password", type=str)
     parser.add_argument("-e", "--expiry", help="F5XC API Credential Expiry Days", type=str)
@@ -360,7 +360,7 @@ if __name__ == '__main__':
             raise ValueError(f'"vk8s" must not be None if "ctype" is of type {F5XCApiCredentialTypes.KUBE_CONFIG.name}')
         apic.credential_type = args.ctype
         apic.virtual_k8s_name = args.vk8s if apic.credential_type == F5XCApiCredentialTypes.KUBE_CONFIG.name else ""
-        apic.expiration_days = args.expiry if apic.credential_type == F5XCApiCredentialTypes.KUBE_CONFIG.name else ""
+        apic.expiration_days = args.expiry if args.expiry is not None else F5XC_API_CERT_EXPIRATION_DAYS
         apic.virtual_k8s_namespace = args.namespace if apic.credential_type == F5XCApiCredentialTypes.KUBE_CONFIG.name else ""
         apic.certificate_password = args.certpw if apic.credential_type == F5XCApiCredentialTypes.API_CERTIFICATE.name else ""
         print(f"Initiate {Action.POST.name} request")
@@ -371,7 +371,8 @@ if __name__ == '__main__':
             if r.status_code == 200:
                 print("Creating new object... Done. Creating state:", apic.create_state_file(data=r.json()))
             else:
-                print(f"Response Status Code: {r.status_code} --> Response Message: {r.json()}")
+                print("R:", r)
+                # print(f"Response Status Code: {r.status_code} --> Response Message: {r.json()}")
         else:
             print("Found local state... Checking object exists...")
             r = apic.get()

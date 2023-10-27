@@ -1,9 +1,7 @@
 output "ce" {
   value = {
-    master-0 = {
-      node    = module.node[0].ce["master-0"]
-      config  = module.config[0].ce["master-0"]
-      network = local.create_network ? module.network[0].ce["master-0"] : null
-    }
+    nodes    = module.node.ce
+    network  = local.create_network ? module.network_common[0].common : null
+    firewall = local.create_network ? module.firewall[0].ce : null
   }
 }

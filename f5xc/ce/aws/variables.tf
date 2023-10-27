@@ -3,7 +3,8 @@ variable "is_sensitive" {
 }
 
 variable "has_public_ip" {
-  type = bool
+  type    = bool
+  default = true
 }
 
 variable "instance_type" {
@@ -13,6 +14,11 @@ variable "instance_type" {
 
 variable "owner_tag" {
   type = string
+}
+
+variable "create_new_aws_vpc" {
+  type    = bool
+  default = true
 }
 
 variable "f5xc_ce_hosts_public_name" {
@@ -29,119 +35,115 @@ variable "ssh_public_key" {
   type = string
 }
 
-variable "aws_security_group_rule_slo_egress" {
+variable "aws_existing_vpc_id" {
+  type    = string
+  default = ""
+}
+
+variable "aws_security_group_rules_slo_egress_default" {
   type = list(object({
     from_port   = number
     to_port     = number
-    protocol    = string
+    ip_protocol = string
     cidr_blocks = list(string)
   }))
   default = [
     {
-      from_port   = 0
-      to_port     = 0
-      protocol    = -1
+      from_port   = -1
+      to_port     = -1
+      ip_protocol = -1
       cidr_blocks = ["0.0.0.0/0"]
     }
   ]
 }
 
-variable "aws_security_group_rule_slo_ingress" {
+variable "aws_security_group_rules_slo_ingress_default" {
   type = list(object({
     from_port   = number
     to_port     = number
-    protocol    = string
+    ip_protocol = string
     cidr_blocks = list(string)
   }))
   default = [
     {
-      from_port   = 22
-      to_port     = 22
-      protocol    = "tcp"
-      cidr_blocks = ["0.0.0.0/0"]
-    },
-    {
-      from_port   = "-1"
-      to_port     = "-1"
-      protocol    = "icmp"
-      cidr_blocks = ["0.0.0.0/0"]
-    },
-    {
-      from_port   = "4500"
-      to_port     = "4500"
-      protocol    = "udp"
-      cidr_blocks = ["0.0.0.0/0"]
-    }, {
-      from_port   = 0
-      to_port     = 65535
-      protocol    = "tcp"
-      cidr_blocks = ["10.0.0.0/8"]
-    },
-    {
-      from_port   = 0
-      to_port     = 65535
-      protocol    = "tcp"
-      cidr_blocks = ["192.168.0.0/16"]
-    },
-    {
-      from_port   = 0
-      to_port     = 65535
-      protocol    = "tcp"
-      cidr_blocks = ["172.16.0.0/12"]
-    },
-    {
-      from_port   = 0
-      to_port     = 65535
-      protocol    = "udp"
-      cidr_blocks = ["10.0.0.0/8"]
-    },
-    {
-      from_port   = 0
-      to_port     = 65535
-      protocol    = "udp"
-      cidr_blocks = ["192.168.0.0/16"]
-    },
-    {
-      from_port   = 0
-      to_port     = 65535
-      protocol    = "udp"
-      cidr_blocks = ["172.16.0.0/12"]
-    }
-  ]
-}
-
-variable "aws_security_group_rule_sli_egress" {
-  type = list(object({
-    from_port   = number
-    to_port     = number
-    protocol    = string
-    cidr_blocks = list(string)
-  }))
-  default = [
-    {
-      from_port   = 0
-      to_port     = 0
-      protocol    = -1
+      from_port   = -1
+      to_port     = -1
+      ip_protocol = -1
       cidr_blocks = ["0.0.0.0/0"]
     }
   ]
 }
 
-variable "aws_security_group_rule_sli_ingress" {
+variable "aws_security_group_rules_sli_egress_default" {
   type = list(object({
     from_port   = number
     to_port     = number
-    protocol    = string
+    ip_protocol = string
     cidr_blocks = list(string)
   }))
   default = [
     {
-      from_port   = 22
-      to_port     = 22
-      protocol    = "tcp"
+      from_port   = -1
+      to_port     = -1
+      ip_protocol = -1
       cidr_blocks = ["0.0.0.0/0"]
     }
   ]
+}
+
+variable "aws_security_group_rules_sli_ingress_default" {
+  type = list(object({
+    from_port   = number
+    to_port     = number
+    ip_protocol = string
+    cidr_blocks = list(string)
+  }))
+  default = [
+    {
+      from_port   = -1
+      to_port     = -1
+      ip_protocol = -1
+      cidr_blocks = ["0.0.0.0/0"]
+    }
+  ]
+}
+
+variable "aws_security_group_rules_slo_egress" {
+  type = list(object({
+    from_port   = number
+    to_port     = number
+    ip_protocol = string
+    cidr_blocks = list(string)
+  }))
+}
+
+variable "aws_security_group_rules_slo_ingress" {
+  type = list(object({
+    from_port   = number
+    to_port     = number
+    ip_protocol = string
+    cidr_blocks = list(string)
+  }))
+}
+
+variable "aws_security_group_rules_sli_egress" {
+  type = list(object({
+    from_port   = number
+    to_port     = number
+    ip_protocol = string
+    cidr_blocks = list(string)
+  }))
+  default = []
+}
+
+variable "aws_security_group_rules_sli_ingress" {
+  type = list(object({
+    from_port   = number
+    to_port     = number
+    ip_protocol = string
+    cidr_blocks = list(string)
+  }))
+  default = []
 }
 
 variable "f5xc_cluster_labels" {
@@ -149,15 +151,22 @@ variable "f5xc_cluster_labels" {
 }
 
 variable "f5xc_cluster_latitude" {
-  type = number
+  type    = number
+  default = -73.935242
 }
 
 variable "f5xc_cluster_longitude" {
-  type = number
+  type    = number
+  default = 40.730610
 }
 
 variable "f5xc_api_url" {
   type = string
+}
+
+variable "f5xc_api_ca_cert" {
+  type    = string
+  default = ""
 }
 
 variable "f5xc_api_token" {
@@ -176,6 +185,11 @@ variable "f5xc_namespace" {
   type = string
 }
 
+variable "f5xc_ce_gateway_type_voltstack" {
+  type    = string
+  default = "voltstack"
+}
+
 variable "f5xc_ce_gateway_type_ingress" {
   type    = string
   default = "ingress_gateway"
@@ -189,8 +203,8 @@ variable "f5xc_ce_gateway_type_ingress_egress" {
 variable "f5xc_ce_gateway_type" {
   type = string
   validation {
-    condition     = contains(["ingress_egress_gateway", "ingress_gateway"], var.f5xc_ce_gateway_type)
-    error_message = format("Valid values for gateway_type: ingress_egress_gateway, ingress_gateway")
+    condition     = contains(["ingress_egress_gateway", "ingress_gateway", "voltstack"], var.f5xc_ce_gateway_type)
+    error_message = format("Valid values for gateway_type: ingress_egress_gateway, ingress_gateway, voltstack")
   }
 }
 
@@ -206,6 +220,10 @@ variable "f5xc_registration_retry" {
 
 variable "f5xc_aws_vpc_az_nodes" {
   type = map(map(string))
+  validation {
+    condition     = length(var.f5xc_aws_vpc_az_nodes) == 1 || length(var.f5xc_aws_vpc_az_nodes) == 3 || length(var.f5xc_aws_vpc_az_nodes) == 0
+    error_message = "f5xc_aws_vpc_az_nodes must be 0,1 or 3"
+  }
 }
 
 variable "f5xc_aws_region" {
@@ -214,6 +232,16 @@ variable "f5xc_aws_region" {
 
 variable "f5xc_cluster_name" {
   type = string
+}
+
+variable "f5xc_is_secure_cloud_ce" {
+  type    = bool
+  default = false
+}
+
+variable "f5xc_ce_slo_enable_secure_sg" {
+  type    = bool
+  default = false
 }
 
 variable "f5xc_ce_machine_image" {
@@ -243,6 +271,30 @@ variable "f5xc_ce_machine_image" {
       us-west-2      = string
     })
     ingress_egress_gateway = object({
+      af-south-1     = string
+      ap-east-1      = string
+      ap-northeast-1 = string
+      ap-northeast-2 = string
+      ap-northeast-3 = string
+      ap-south-1     = string
+      ap-southeast-1 = string
+      ap-southeast-2 = string
+      ap-southeast-3 = string
+      ca-central-1   = string
+      eu-central-1   = string
+      eu-north-1     = string
+      eu-south-1     = string
+      eu-west-1      = string
+      eu-west-2      = string
+      eu-west-3      = string
+      me-south-1     = string
+      sa-east-1      = string
+      us-east-1      = string
+      us-east-2      = string
+      us-west-1      = string
+      us-west-2      = string
+    })
+    voltstack = object({
       af-south-1     = string
       ap-east-1      = string
       ap-northeast-1 = string
@@ -316,14 +368,118 @@ variable "f5xc_ce_machine_image" {
       us-west-1      = "ami-092a2a07d2d3a445f"
       us-west-2      = "ami-07252e5ab4023b8cf"
     }
+    voltstack = {
+      af-south-1     = "ami-055ba977ad1ac6c6c"
+      ap-east-1      = "ami-05673740d6f3baee9"
+      ap-northeast-1 = "ami-030863f8dfd7029f5"
+      ap-northeast-2 = "ami-001dd539455cd4038"
+      ap-northeast-3 = ""
+      ap-south-1     = "ami-00788bd38d0fa4ff0"
+      ap-southeast-1 = "ami-0615e371749491e5f"
+      ap-southeast-2 = "ami-0538af7edde340eb1"
+      ap-southeast-3 = "ami-0f0c6b2822abb73e2"
+      ca-central-1   = "ami-0e1d39ac2c1c6ef2b"
+      eu-central-1   = "ami-094c24e0ff9141647"
+      eu-north-1     = "ami-0e939f8711e36b456"
+      eu-south-1     = "ami-0648b746bb1341bf4"
+      eu-west-1      = "ami-01ef385d886b812d2"
+      eu-west-2      = "ami-041138a60e1cb4314"
+      eu-west-3      = "ami-0e576d6275f207196"
+      me-south-1     = "ami-06603c1772bd574c2"
+      sa-east-1      = "ami-082f0a654c0936aa5"
+      us-east-1      = "ami-0f0926d6b6838b9cb"
+      us-east-2      = "ami-0d011fcc6cae3ed0a"
+      us-west-1      = "ami-0bec6c226bff67de2"
+      us-west-2      = "ami-0d2f1966d883656cd"
+    }
   }
 }
 
 variable "aws_vpc_cidr_block" {
-  type = string
+  type    = string
+  default = ""
 }
 
-/*variable "f5xc_slo_cidr_block" {
-  type = string
-}*/
+variable "f5xc_ip_ranges_Americas_TCP" {
+  type    = list(string)
+  default = ["84.54.62.0/25", "185.94.142.0/25", "185.94.143.0/25", "159.60.190.0/24", "5.182.215.0/25", "84.54.61.0/25", "23.158.32.0/25",]
+}
+variable "f5xc_ip_ranges_Americas_UDP" {
+  type    = list(string)
+  default = ["23.158.32.0/25", "84.54.62.0/25", "185.94.142.0/25", "185.94.143.0/25", "159.60.190.0/24", "5.182.215.0/25", "84.54.61.0/25",]
+}
+variable "f5xc_ip_ranges_Europe_TCP" {
+  type    = list(string)
+  default = ["84.54.60.0/25", "185.56.154.0/25", "159.60.162.0/24", "159.60.188.0/24", "5.182.212.0/25", "5.182.214.0/25", "159.60.160.0/24", "5.182.213.0/25", "5.182.213.128/25",]
+}
+variable "f5xc_ip_ranges_Europe_UDP" {
+  type    = list(string)
+  default = ["5.182.212.0/25", "185.56.154.0/25", "159.60.160.0/24", "5.182.213.0/25", "5.182.213.128/25", "5.182.214.0/25", "84.54.60.0/25", "159.60.162.0/24", "159.60.188.0/24",]
+}
+variable "f5xc_ip_ranges_Asia_TCP" {
+  type    = list(string)
+  default = ["103.135.56.0/25", "103.135.56.128/25", "103.135.58.128/25", "159.60.189.0/24", "159.60.166.0/24", "103.135.57.0/25", "103.135.59.0/25", "103.135.58.0/25", "159.60.164.0/24",]
+}
+variable "f5xc_ip_ranges_Asia_UDP" {
+  type    = list(string)
+  default = ["103.135.57.0/25", "103.135.56.128/25", "103.135.59.0/25", "103.135.58.0/25", "159.60.166.0/24", "159.60.164.0/24", "103.135.56.0/25", "103.135.58.128/25", "159.60.189.0/24",]
+}
 
+variable "f5xc_ce_egress_ip_ranges" {
+  type        = list(string)
+  description = "Egress IP ranges for F5 XC CE"
+  default     = [
+    "20.33.0.0/16",
+    "74.125.0.0/16",
+    "18.64.0.0/10",
+    "52.223.128.0/18",
+    "20.152.0.0/15",
+    "13.107.238.0/24",
+    "142.250.0.0/15",
+    "20.34.0.0/15",
+    "52.192.0.0/12",
+    "52.208.0.0/13",
+    "52.223.0.0/17",
+    "18.32.0.0/11",
+    "3.208.0.0/12",
+    "13.107.237.0/24",
+    "20.36.0.0/14",
+    "52.222.0.0/16",
+    "52.220.0.0/15",
+    "3.0.0.0/9",
+    "100.64.0.0/10",
+    "54.88.0.0/16",
+    "52.216.0.0/14",
+    "108.177.0.0/17",
+    "20.40.0.0/13",
+    "54.64.0.0/11",
+    "172.253.0.0/16",
+    "20.64.0.0/10",
+    "20.128.0.0/16",
+    "172.217.0.0/16",
+    "173.194.0.0/16",
+    "20.150.0.0/15",
+    "20.48.0.0/12",
+    "72.19.3.0/24",
+    "18.128.0.0/9",
+    "23.20.0.0/14",
+    "13.104.0.0/14",
+    "13.96.0.0/13",
+    "13.64.0.0/11",
+    "13.249.0.0/16",
+    "34.192.0.0/10",
+    "3.224.0.0/12",
+    "54.208.0.0/13",
+    "54.216.0.0/14",
+    "108.156.0.0/14",
+    "54.144.0.0/12",
+    "54.220.0.0/15",
+    "54.192.0.0/12",
+    "54.160.0.0/11",
+    "52.88.0.0/13",
+    "52.84.0.0/14",
+    "52.119.128.0/17",
+    "54.240.192.0/18",
+    "52.94.208.0/21"
+  ]
+}

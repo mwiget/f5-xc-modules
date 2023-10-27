@@ -100,32 +100,7 @@ variable "f5xc_aws_vpc_no_global_network" {
   default = true
 }
 
-variable "f5xc_sm_connection_public_ip" {
-  type    = bool
-  default = true
-}
-
-variable "f5xc_sm_connection_pvt_ip" {
-  type    = bool
-  default = false
-}
-
-/*variable "f5xc_aws_vpc_no_outside_static_routes" {
-  type    = bool
-  default = true
-}
-
-variable "f5xc_aws_vpc_no_inside_static_routes" {
-  type    = bool
-  default = true
-}*/
-
-variable "f5xc_aws_vpc_no_network_policy" {
-  type    = bool
-  default = true
-}
-
-variable "f5xc_aws_vpc_no_forward_proxy" {
+variable "f5xc_aws_vpc_sm_connection_public_ip" {
   type    = bool
   default = true
 }
@@ -247,6 +222,11 @@ variable "f5xc_aws_vpc_direct_connect_custom_asn" {
   default = 0
 }
 
+variable "f5xc_aws_vpc_enable_internet_vip" {
+  type    = bool
+  default = false
+}
+
 variable "f5xc_aws_vpc_cloud_aggregated_prefix" {
   type    = list(string)
   default = []
@@ -267,8 +247,34 @@ variable "f5xc_aws_vpc_outside_static_routes" {
   default = []
 }
 
+variable "f5xc_active_forward_proxy_policies" {
+  type = list(object({
+    name      = string
+    tenant    = string
+    namespace = string
+  }))
+  default = []
+}
+
+variable "f5xc_active_network_policies" {
+  type = list(object({
+    name      = string
+    tenant    = string
+    namespace = string
+  }))
+  default = []
+}
+
+variable "f5xc_active_enhanced_firewall_policies" {
+  type = list(object({
+    name      = string
+    tenant    = string
+    namespace = string
+  }))
+  default = []
+}
+
 variable "is_sensitive" {
   type    = bool
   default = false
 }
-

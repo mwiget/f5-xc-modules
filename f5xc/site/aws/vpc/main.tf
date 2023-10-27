@@ -5,6 +5,8 @@ resource "volterra_aws_vpc_site" "site" {
   tags                    = var.custom_tags
   labels                  = var.f5xc_labels
   direct_connect_disabled = var.f5xc_aws_vpc_direct_connect_disabled
+  enable_internet_vip     = var.f5xc_aws_vpc_enable_internet_vip
+  disable_internet_vip    = var.f5xc_aws_vpc_enable_internet_vip ? false : true
 
   aws_cred {
     name      = var.f5xc_aws_cred
@@ -63,7 +65,9 @@ resource "volterra_aws_vpc_site" "site" {
   dynamic "ingress_gw" {
     for_each = var.f5xc_aws_ce_gw_type == var.f5xc_nic_type_single_nic ? [1] : []
     content {
-      aws_certified_hw = var.f5xc_aws_ce_certified_hw[var.f5xc_aws_ce_gw_type]
+      aws_certified_hw        = var.f5xc_aws_ce_certified_hw[var.f5xc_aws_ce_gw_type]
+      //sm_connection_pvt_ip    = var.f5xc_aws_vpc_sm_connection_public_ip ? false : true
+      //sm_connection_public_ip = var.f5xc_aws_vpc_sm_connection_public_ip
       allowed_vip_port {
         use_http_https_port = var.f5xc_aws_vpc_use_http_https_port
       }
@@ -96,9 +100,10 @@ resource "volterra_aws_vpc_site" "site" {
   dynamic "ingress_egress_gw" {
     for_each = var.f5xc_aws_ce_gw_type == var.f5xc_nic_type_multi_nic ? [1] : []
     content {
-      sm_connection_public_ip = var.f5xc_sm_connection_public_ip
-      sm_connection_pvt_ip    = var.f5xc_sm_connection_pvt_ip
       aws_certified_hw        = var.f5xc_aws_ce_certified_hw[var.f5xc_aws_ce_gw_type]
+      sm_connection_pvt_ip    = var.f5xc_aws_vpc_sm_connection_public_ip ? false : true
+      sm_connection_public_ip = var.f5xc_aws_vpc_sm_connection_public_ip
+
       allowed_vip_port {
         use_http_https_port = var.f5xc_aws_vpc_use_http_https_port
       }
@@ -172,7 +177,6 @@ resource "volterra_aws_vpc_site" "site" {
       }
 
       no_global_network = var.f5xc_aws_vpc_no_global_network
-      # no_outside_static_routes = var.f5xc_aws_vpc_no_outside_static_routes
       dynamic "outside_static_routes" {
         for_each = length(var.f5xc_aws_vpc_outside_static_routes) > 0 ? [1] : []
         content {
@@ -185,7 +189,6 @@ resource "volterra_aws_vpc_site" "site" {
         }
       }
 
-      # no_inside_static_routes = var.f5xc_aws_vpc_no_inside_static_routes
       dynamic "inside_static_routes" {
         for_each = length(var.f5xc_aws_vpc_inside_static_routes) > 0 ? [1] : []
         content {
@@ -197,8 +200,30 @@ resource "volterra_aws_vpc_site" "site" {
           }
         }
       }
-      no_network_policy = var.f5xc_aws_vpc_no_network_policy
-      no_forward_proxy  = var.f5xc_aws_vpc_no_forward_proxy
+      no_network_policy = length(var.f5xc_active_network_policies) > 0 ? false : true
+      no_forward_proxy  = length(var.f5xc_active_forward_proxy_policies) > 0 ? false : true
+
+      dynamic "active_forward_proxy_policies" {
+        for_each = var.f5xc_active_forward_proxy_policies
+        content {
+          forward_proxy_policies {
+            name      = active_forward_proxy_policies.value.name
+            tenant    = active_forward_proxy_policies.value.tenant
+            namespace = active_forward_proxy_policies.value.namespace
+          }
+        }
+      }
+
+      dynamic "active_network_policies" {
+        for_each = var.f5xc_active_network_policies
+        content {
+          network_policies {
+            name      = active_network_policies.value.name
+            tenant    = active_network_policies.value.tenant
+            namespace = active_network_policies.value.namespace
+          }
+        }
+      }
     }
   }
 
@@ -211,13 +236,13 @@ resource "volterra_aws_vpc_site" "site" {
   }
 }
 
-resource "volterra_cloud_site_labels" "labels" {
+/*resource "volterra_cloud_site_labels" "labels" {
   name             = volterra_aws_vpc_site.site.name
   site_type        = var.f5xc_aws_site_kind
   # need at least one label, otherwise site_type is ignored
   labels           = merge({ "key" = "value" }, var.f5xc_labels)
   ignore_on_delete = var.f5xc_cloud_site_labels_ignore_on_delete
-}
+}*/
 
 resource "volterra_tf_params_action" "aws_vpc_action" {
   site_name       = volterra_aws_vpc_site.site.name
